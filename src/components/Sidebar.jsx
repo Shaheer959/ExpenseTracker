@@ -30,6 +30,7 @@ const NAV_ICONS = {
   list: 'M4 6h16M4 12h16M4 18h16',
   pie: 'M21 12A9 9 0 113 12a9 9 0 0118 0z M12 3v9h9',
   download: 'M12 3v12M7 10l5 5 5-5M5 21h14',
+  close: 'M6 6l12 12M18 6L6 18',
 }
 
 function NavRow({ icon, label, active, count, onClick }) {
@@ -37,7 +38,7 @@ function NavRow({ icon, label, active, count, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center gap-2.5 rounded-lg border-none px-2.5 py-2 text-left text-[13px] ${
+      className={`flex w-full items-center gap-2.5 rounded-lg border-none px-2.5 py-2.5 text-left text-[14px] ${
         active
           ? 'bg-[var(--color-panel-alt)] font-semibold text-[var(--color-text)]'
           : 'bg-transparent font-medium text-[var(--color-text-dim)] hover:bg-[var(--color-panel-alt)]'
@@ -60,6 +61,8 @@ export default function Sidebar({
   setSelectedCategory,
   activeView,
   setActiveView,
+  drawerOpen,
+  onCloseDrawer,
 }) {
   const totalsByCategory = useMemo(() => {
     return expenses.reduce((acc, e) => {
@@ -72,16 +75,29 @@ export default function Sidebar({
   // a stable sidebar is easier to navigate than one that reshuffles.
   const activeCats = CATEGORIES.filter((c) => totalsByCategory[c])
 
-  return (
-    <aside
-      className="hidden w-[240px] shrink-0 flex-col gap-5 self-start border-r border-[var(--color-line)] bg-[var(--color-panel)] p-4 lg:flex"
-      style={{
-        position: 'sticky',
-        top: 61,
-        height: 'calc(100vh - 61px)',
-        overflowY: 'auto',
-      }}
-    >
+  // Helper: every nav action on mobile should also dismiss the drawer.
+  const close = () => onCloseDrawer && onCloseDrawer()
+
+  // Inner content — identical between the inline desktop aside and the
+  // mobile drawer panel.
+  const content = (
+    <>
+      {/* Mobile-only drawer header with close button. Hidden at lg+ where
+         the sidebar is rendered inline. */}
+      <div className="flex items-center justify-between pl-2.5 pr-1 lg:hidden">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]">
+          Menu
+        </div>
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={close}
+          className="grid h-8 w-8 place-items-center rounded-lg border border-[var(--color-line)] bg-transparent text-[var(--color-text-dim)]"
+        >
+          <Icon d={NAV_ICONS.close} size={16} />
+        </button>
+      </div>
+
       <div>
         <div className="mb-2 pl-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]">
           Workspace
@@ -95,13 +111,17 @@ export default function Sidebar({
             onClick={() => {
               setSelectedCategory(null)
               setActiveView('overview')
+              close()
             }}
           />
           <NavRow
             icon={NAV_ICONS.list}
             label="All expenses"
             active={activeView === 'all-expenses'}
-            onClick={() => setActiveView('all-expenses')}
+            onClick={() => {
+              setActiveView('all-expenses')
+              close()
+            }}
           />
           <NavRow
             icon={NAV_ICONS.pie}
@@ -110,6 +130,7 @@ export default function Sidebar({
             onClick={() => {
               setSelectedCategory(null)
               setActiveView('insights')
+              close()
             }}
           />
           <NavRow
@@ -119,6 +140,7 @@ export default function Sidebar({
             onClick={() => {
               setSelectedCategory(null)
               setActiveView('export')
+              close()
             }}
           />
         </div>
@@ -143,8 +165,9 @@ export default function Sidebar({
                   onClick={() => {
                     setSelectedCategory(active ? null : c)
                     if (!active) setActiveView('all-expenses')
+                    close()
                   }}
-                  className={`flex w-full items-center gap-2.5 rounded-lg border-none px-2.5 py-2 text-left text-[13px] ${
+                  className={`flex w-full items-center gap-2.5 rounded-lg border-none px-2.5 py-2.5 text-left text-[14px] ${
                     active
                       ? 'bg-[var(--color-panel-alt)] font-semibold text-[var(--color-text)]'
                       : 'bg-transparent font-medium text-[var(--color-text-dim)] hover:bg-[var(--color-panel-alt)]'
@@ -173,6 +196,47 @@ export default function Sidebar({
           Data lives in your browser. No account, no sync.
         </div>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Desktop (lg+) — original inline sticky sidebar, unchanged. */}
+      <aside
+        className="hidden w-[240px] shrink-0 flex-col gap-5 self-start border-r border-[var(--color-line)] bg-[var(--color-panel)] p-4 lg:flex"
+        style={{
+          position: 'sticky',
+          top: 61,
+          height: 'calc(100vh - 61px)',
+          overflowY: 'auto',
+        }}
+      >
+        {content}
+      </aside>
+
+      {/* Mobile (below lg) — slide-in drawer overlaying the content. */}
+      <div
+        className={`fixed inset-0 z-40 lg:hidden ${
+          drawerOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
+        aria-hidden={!drawerOpen}
+      >
+        {/* Dim overlay */}
+        <div
+          onClick={close}
+          className={`absolute inset-0 bg-black/60 transition-opacity duration-200 ${
+            drawerOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+        {/* Drawer panel */}
+        <aside
+          className={`absolute left-0 top-0 flex h-full w-[280px] max-w-[85vw] flex-col gap-5 overflow-y-auto border-r border-[var(--color-line)] bg-[var(--color-panel)] p-4 shadow-2xl transition-transform duration-200 ${
+            drawerOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          {content}
+        </aside>
+      </div>
+    </>
   )
 }

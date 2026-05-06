@@ -70,61 +70,118 @@ export default function ExpenseItem({ expense, onEdit, onDelete }) {
     .padStart(2, '0')
 
   return (
-    <li
-      className="expense-row grid items-center gap-4 border-b border-[var(--color-line)] px-[18px] py-3.5 last:border-b-0"
-      style={{ gridTemplateColumns: '36px 140px minmax(0, 1fr) auto auto' }}
-    >
-      <CatSwatch cat={category} />
+    <li className="expense-row border-b border-[var(--color-line)] px-3 py-3 last:border-b-0 sm:px-[18px] sm:py-3.5">
+      {/* Desktop layout — unchanged five-column grid. */}
+      <div
+        className="hidden items-center gap-4 sm:grid"
+        style={{ gridTemplateColumns: '36px 140px minmax(0, 1fr) auto auto' }}
+      >
+        <CatSwatch cat={category} />
 
-      <div className="flex min-w-0 flex-col gap-0.5">
-        <span
-          className="inline-block self-start rounded px-[7px] py-[2px] text-[10px] font-semibold uppercase tracking-[0.02em]"
-          style={{
-            background: categoryTagBg(category),
-            color: categoryTagFg(category),
-          }}
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <span
+            className="inline-block self-start rounded px-[7px] py-[2px] text-[10px] font-semibold uppercase tracking-[0.02em]"
+            style={{
+              background: categoryTagBg(category),
+              color: categoryTagFg(category),
+            }}
+          >
+            {category}
+          </span>
+          <span className="text-[11px] tabular-nums text-[var(--color-text-faint)]">
+            {formatDateShort(date)} · {formatRelativeDay(date)}
+          </span>
+        </div>
+
+        <div className="min-w-0">
+          <div className="truncate text-[14px] font-medium text-[var(--color-text)]">
+            {description || (
+              <span className="italic text-[var(--color-text-faint)]">No note</span>
+            )}
+          </div>
+        </div>
+
+        <div
+          className="flex items-baseline gap-0.5 font-serif tabular-nums text-[var(--color-text)]"
+          style={{ fontSize: 22, letterSpacing: '-0.01em' }}
         >
-          {category}
-        </span>
-        <span className="text-[11px] tabular-nums text-[var(--color-text-faint)]">
-          {formatDateShort(date)} · {formatRelativeDay(date)}
-        </span>
-      </div>
+          <span className="mr-0.5 text-[13px] text-[var(--color-text-faint)]">Rs.</span>
+          <span>{dollars.toLocaleString('en-US')}</span>
+          <span className="text-[13px] text-[var(--color-text-faint)]">.{cents}</span>
+        </div>
 
-      <div className="min-w-0">
-        <div className="truncate text-[14px] font-medium text-[var(--color-text)]">
-          {description || (
-            <span className="italic text-[var(--color-text-faint)]">No note</span>
-          )}
+        <div className="row-actions flex gap-1 opacity-0 transition-opacity">
+          <button
+            type="button"
+            onClick={() => onEdit(id)}
+            aria-label="Edit"
+            className="grid h-7 w-7 place-items-center rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] text-[var(--color-text-dim)] hover:text-[var(--color-text)]"
+          >
+            <EditIcon />
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(id)}
+            aria-label="Delete"
+            className="grid h-7 w-7 place-items-center rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] text-[var(--color-danger)] hover:opacity-80"
+          >
+            <TrashIcon />
+          </button>
         </div>
       </div>
 
-      <div
-        className="flex items-baseline gap-0.5 font-serif tabular-nums text-[var(--color-text)]"
-        style={{ fontSize: 22, letterSpacing: '-0.01em' }}
-      >
-        <span className="mr-0.5 text-[13px] text-[var(--color-text-faint)]">Rs.</span>
-        <span>{dollars.toLocaleString('en-US')}</span>
-        <span className="text-[13px] text-[var(--color-text-faint)]">.{cents}</span>
-      </div>
-
-      <div className="row-actions flex gap-1 opacity-0 transition-opacity">
-        <button
-          type="button"
-          onClick={() => onEdit(id)}
-          aria-label="Edit"
-          className="grid h-7 w-7 place-items-center rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] text-[var(--color-text-dim)] hover:text-[var(--color-text)]"
-        >
-          <EditIcon />
-        </button>
-        <button
-          type="button"
-          onClick={() => onDelete(id)}
-          aria-label="Delete"
-          className="grid h-7 w-7 place-items-center rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] text-[var(--color-danger)] hover:opacity-80"
-        >
-          <TrashIcon />
-        </button>
+      {/* Mobile layout — stacked. Two rows: top has swatch + meta + amount;
+         bottom has the description note alongside always-visible Edit and
+         Delete tap targets sized to ~44px. */}
+      <div className="flex flex-col gap-2 sm:hidden">
+        <div className="flex items-center gap-3">
+          <CatSwatch cat={category} />
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span
+              className="inline-block self-start rounded px-[7px] py-[2px] text-[10px] font-semibold uppercase tracking-[0.02em]"
+              style={{
+                background: categoryTagBg(category),
+                color: categoryTagFg(category),
+              }}
+            >
+              {category}
+            </span>
+            <span className="text-[11px] tabular-nums text-[var(--color-text-faint)]">
+              {formatDateShort(date)} · {formatRelativeDay(date)}
+            </span>
+          </div>
+          <div
+            className="flex shrink-0 items-baseline gap-0.5 font-serif tabular-nums text-[var(--color-text)]"
+            style={{ fontSize: 18, letterSpacing: '-0.01em' }}
+          >
+            <span className="mr-0.5 text-[12px] text-[var(--color-text-faint)]">Rs.</span>
+            <span>{dollars.toLocaleString('en-US')}</span>
+            <span className="text-[12px] text-[var(--color-text-faint)]">.{cents}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1 truncate text-[14px] text-[var(--color-text-dim)]">
+            {description || (
+              <span className="italic text-[var(--color-text-faint)]">No note</span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => onEdit(id)}
+            aria-label="Edit"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] text-[var(--color-text-dim)]"
+          >
+            <EditIcon />
+          </button>
+          <button
+            type="button"
+            onClick={() => onDelete(id)}
+            aria-label="Delete"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] text-[var(--color-danger)]"
+          >
+            <TrashIcon />
+          </button>
+        </div>
       </div>
     </li>
   )

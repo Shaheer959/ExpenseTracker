@@ -26,7 +26,7 @@ function Chip({ label, active, onClick, dotColor }) {
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex items-center gap-2 rounded-full border px-3 py-[7px] text-[12px] font-medium transition-colors ${
+      className={`inline-flex min-h-[36px] items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-medium transition-colors sm:min-h-0 sm:px-3 sm:py-[7px] sm:text-[12px] ${
         active
           ? 'border-[var(--color-text)] bg-[var(--color-text)] text-[var(--color-bg)]'
           : 'border-[var(--color-line)] bg-transparent text-[var(--color-text-dim)] hover:bg-[var(--color-panel-alt)]'

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import CategorySummary from './components/CategorySummary'
+import SpendingChart from './components/SpendingChart'
 import ExpenseList from './components/ExpenseList'
 import ExpenseForm from './components/ExpenseForm'
 import FilterBar from './components/FilterBar'
@@ -86,6 +87,9 @@ export default function App() {
   const [deletingId, setDeletingId] = useState(null)
   // 'overview' | 'all-expenses' | 'insights' | 'export'
   const [activeView, setActiveView] = useState('overview')
+  // Mobile-only: controls the slide-in sidebar drawer. Inert on desktop
+  // (lg+) where the sidebar is rendered inline.
+  const [drawerOpen, setDrawerOpen] = useState(false)
   // Tracks the view the user was on before search auto-switched them, so
   // clearing the query can return them there. null = no auto-switch active.
   const [preSearchView, setPreSearchView] = useState(null)
@@ -202,7 +206,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]">
-      <HeaderBar query={query} onQueryChange={setQuery} onAdd={openAdd} />
+      <HeaderBar
+        query={query}
+        onQueryChange={setQuery}
+        onAdd={openAdd}
+        onMenuClick={() => setDrawerOpen(true)}
+      />
 
       <div className="flex">
         <Sidebar
@@ -211,6 +220,8 @@ export default function App() {
           setSelectedCategory={setSelectedCategory}
           activeView={activeView}
           setActiveView={setActiveView}
+          drawerOpen={drawerOpen}
+          onCloseDrawer={() => setDrawerOpen(false)}
         />
 
         <main className="min-w-0 flex-1 px-4 pb-16 pt-7 sm:px-9">
@@ -280,6 +291,10 @@ export default function App() {
 
             {activeView === 'overview' && (
               <>
+                <div className="mb-6">
+                  <SpendingChart expenses={expenses} />
+                </div>
+
                 <CategorySummary expenses={expenses} />
 
                 <section className="mt-9">

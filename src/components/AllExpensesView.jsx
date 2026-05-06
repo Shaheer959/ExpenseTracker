@@ -80,8 +80,10 @@ export default function AllExpensesView({
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-[var(--color-line)] bg-[var(--color-panel)]">
+          {/* Column header — desktop only. Hidden below md so the mobile
+             card layout has no leftover table chrome. */}
           <div
-            className="grid items-center gap-4 bg-[var(--color-panel-alt)] px-[18px] py-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)]"
+            className="hidden items-center gap-4 bg-[var(--color-panel-alt)] px-[18px] py-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-faint)] md:grid"
             style={{ gridTemplateColumns: '120px minmax(0,1fr) 160px 130px 80px' }}
           >
             <span>Date</span>
@@ -94,49 +96,100 @@ export default function AllExpensesView({
             {visible.map((e) => (
               <li
                 key={e.id}
-                className="expense-row grid items-center gap-4 border-b border-[var(--color-line)] px-[18px] py-3 last:border-b-0"
-                style={{ gridTemplateColumns: '120px minmax(0,1fr) 160px 130px 80px' }}
+                className="expense-row border-b border-[var(--color-line)] last:border-b-0"
               >
-                <span className="text-[12px] tabular-nums text-[var(--color-text-dim)]">
-                  {formatDate(e.date)}
-                </span>
-                <span className="truncate text-[13px] text-[var(--color-text)]">
-                  {e.description || (
-                    <span className="italic text-[var(--color-text-faint)]">
-                      No note
-                    </span>
-                  )}
-                </span>
-                <span>
-                  <span
-                    className="inline-block rounded px-[7px] py-[2px] text-[10px] font-semibold uppercase tracking-[0.02em]"
-                    style={{
-                      background: categoryTagBg(e.category),
-                      color: categoryTagFg(e.category),
-                    }}
-                  >
-                    {e.category}
+                {/* Desktop row — original five-column grid, untouched. */}
+                <div
+                  className="hidden items-center gap-4 px-[18px] py-3 md:grid"
+                  style={{ gridTemplateColumns: '120px minmax(0,1fr) 160px 130px 80px' }}
+                >
+                  <span className="text-[12px] tabular-nums text-[var(--color-text-dim)]">
+                    {formatDate(e.date)}
                   </span>
-                </span>
-                <span className="text-right text-[14px] font-medium tabular-nums text-[var(--color-text)]">
-                  {formatCurrency(e.amount)}
-                </span>
-                <span className="row-actions flex justify-end gap-1 opacity-0 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={() => onEdit(e.id)}
-                    className="rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] px-2 py-1 text-[11px] text-[var(--color-text-dim)] hover:text-[var(--color-text)]"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(e.id)}
-                    className="rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] px-2 py-1 text-[11px] text-[var(--color-danger)] hover:opacity-80"
-                  >
-                    Del
-                  </button>
-                </span>
+                  <span className="truncate text-[13px] text-[var(--color-text)]">
+                    {e.description || (
+                      <span className="italic text-[var(--color-text-faint)]">
+                        No note
+                      </span>
+                    )}
+                  </span>
+                  <span>
+                    <span
+                      className="inline-block rounded px-[7px] py-[2px] text-[10px] font-semibold uppercase tracking-[0.02em]"
+                      style={{
+                        background: categoryTagBg(e.category),
+                        color: categoryTagFg(e.category),
+                      }}
+                    >
+                      {e.category}
+                    </span>
+                  </span>
+                  <span className="text-right text-[14px] font-medium tabular-nums text-[var(--color-text)]">
+                    {formatCurrency(e.amount)}
+                  </span>
+                  <span className="row-actions flex justify-end gap-1 opacity-0 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(e.id)}
+                      className="rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] px-2 py-1 text-[11px] text-[var(--color-text-dim)] hover:text-[var(--color-text)]"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(e.id)}
+                      className="rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] px-2 py-1 text-[11px] text-[var(--color-danger)] hover:opacity-80"
+                    >
+                      Del
+                    </button>
+                  </span>
+                </div>
+
+                {/* Mobile card — full width, two rows, no table chrome. */}
+                <div className="flex flex-col gap-2 px-4 py-3.5 md:hidden">
+                  <div className="flex items-center justify-between gap-3">
+                    <span
+                      className="inline-block rounded px-[7px] py-[3px] text-[10px] font-semibold uppercase tracking-[0.02em]"
+                      style={{
+                        background: categoryTagBg(e.category),
+                        color: categoryTagFg(e.category),
+                      }}
+                    >
+                      {e.category}
+                    </span>
+                    <span className="text-right text-[15px] font-semibold tabular-nums text-[var(--color-text)]">
+                      {formatCurrency(e.amount)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="min-w-0 flex-1 truncate text-[14px] text-[var(--color-text-dim)]">
+                      {e.description || (
+                        <span className="italic text-[var(--color-text-faint)]">
+                          No note
+                        </span>
+                      )}
+                    </span>
+                    <span className="shrink-0 text-[12px] tabular-nums text-[var(--color-text-faint)]">
+                      {formatDate(e.date)}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(e.id)}
+                      className="rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] px-3 py-1.5 text-[12px] text-[var(--color-text-dim)]"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(e.id)}
+                      className="rounded-md border border-[var(--color-line)] bg-[var(--color-panel)] px-3 py-1.5 text-[12px] text-[var(--color-danger)]"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>

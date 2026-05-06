@@ -63,7 +63,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
   return (
     <div
       onClick={onCancel}
-      className="fixed inset-0 z-50 grid place-items-center p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4"
       style={{
         background: 'oklch(0 0 0 / 0.6)',
         backdropFilter: 'blur(6px)',
@@ -71,7 +71,7 @@ export default function ExpenseForm({ expense, onSubmit, onCancel }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)] shadow-2xl"
+        className="my-auto w-full overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-panel)] shadow-2xl"
         style={{ maxWidth: 460 }}
       >
         <div className="border-b border-[var(--color-line)] px-6 py-5">
